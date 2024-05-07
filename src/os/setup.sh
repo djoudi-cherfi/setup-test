@@ -56,3 +56,5 @@ main() {
         download_utils || exit 1
     fi
 }
+
+main "$@"
