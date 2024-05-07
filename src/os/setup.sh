@@ -1,0 +1,1 @@
+echo "download and run the setup file"
