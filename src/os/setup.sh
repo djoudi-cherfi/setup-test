@@ -43,15 +43,22 @@ download_utils() {
    return 1
 }
 
-
-
 # ----------------------------------------------------------------------
 # | Main                                                               |
 # ----------------------------------------------------------------------
 
 main() {
 
+    # Ensure that the following actions
+    # are made relative to this file's path.
+
+    cd "$(dirname "${BASH_SOURCE[0]}")" \
+        || exit 1
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
     # Load utils
+
     if [ -x "utils.sh" ]; then
         . "utils.sh" || exit 1
     else
@@ -61,6 +68,13 @@ main() {
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     ask_for_sudo
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Checks that the operating system is supported
+    # and higher than the required version.
+
+    check_supported_os_version || exit 1
 }
 
 main "$@"
