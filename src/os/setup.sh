@@ -43,6 +43,79 @@ download_utils() {
    return 1
 }
 
+download_dotfiles() {
+
+    local tmpFile=""
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    echo "• Download and extract archive"
+
+    tmpFile="$(mktemp /tmp/XXXXX)"
+
+    download "$DOTFILES_TARBALL_URL" "$tmpFile"
+    print_result $? "Download archive"
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # if ! $skipQuestions; then
+
+    #     ask_for_confirmation "Do you want to store the dotfiles in '$default_dotfiles_directory'?"
+
+    #     if ! answer_is_yes; then
+    #         default_dotfiles_directory=""
+    #         while [ -z "$default_dotfiles_directory" ]; do
+    #             ask "Please specify another location for the dotfiles (path): "
+    #             default_dotfiles_directory="$(get_answer)"
+    #         done
+    #     fi
+
+    #     # Ensure the `dotfiles` directory is available
+
+    #     while [ -e "$default_dotfiles_directory" ]; do
+    #         ask_for_confirmation "'$default_dotfiles_directory' already exists, do you want to overwrite it?"
+    #         if answer_is_yes; then
+    #             rm -rf "$default_dotfiles_directory"
+    #             break
+    #         else
+    #             default_dotfiles_directory=""
+    #             while [ -z "$default_dotfiles_directory" ]; do
+    #                 ask "Please specify another location for the dotfiles (path): "
+    #                 default_dotfiles_directory="$(get_answer)"
+    #             done
+    #         fi
+    #     done
+
+    #     printf "\n"
+
+    # else
+
+    #     rm -rf "$default_dotfiles_directory" &> /dev/null
+
+    # fi
+
+    # mkdir -p "$default_dotfiles_directory"
+    # print_result $? "Create '$default_dotfiles_directory'" "true"
+
+    # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # # Extract archive in the `dotfiles` directory.
+
+    # extract "$tmpFile" "$default_dotfiles_directory"
+    # print_result $? "Extract archive" "true"
+
+    # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # rm -rf "$tmpFile"
+    # print_result $? "Remove archive"
+
+    # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # cd "$default_dotfiles_directory/src/os" \
+    #     || return 1
+
+}
+
 # ----------------------------------------------------------------------
 # | Main                                                               |
 # ----------------------------------------------------------------------
@@ -75,6 +148,15 @@ main() {
     # and higher than the required version.
 
     check_supported_os_version || exit 1
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Check if this script was run directly (./<path>/setup.sh),
+    # and if not, it most likely means that the dotfiles were not
+    # yet set up, and they will need to be downloaded.
+
+    echo "${BASH_SOURCE[0]}" | grep "setup.sh" &> /dev/null \
+    || download_dotfiles
 }
 
 main "$@"

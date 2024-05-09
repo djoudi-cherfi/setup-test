@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-echo "download and run the utils file"
-
-echo "ask to run sudo"
-
 # ----------------------------------------------------------------------
 # | CMD                                                                |
 # ----------------------------------------------------------------------
@@ -94,4 +90,50 @@ check_supported_os_version() {
     fi
 
     echo "$erro_message"
+}
+
+
+# ----------------------------------------------------------------------
+# | Question / Answer                                                  |
+# ----------------------------------------------------------------------
+
+ask() {
+    echo "$1"
+    read -r
+}
+
+get_answer() {
+    echo "$REPLY"
+}
+
+confirm_ask() {
+
+    while true; do
+        ask "$1"
+
+        case "$REPLY" in
+            [yY])
+                return 0
+                ;;
+            [nN])
+                return 1
+                ;;
+            *)
+                echo "$2\n"
+                ;;
+        esac
+    done
+}
+
+ask_another_location() {
+
+    while true; do
+        ask "$1"
+        
+        if [[ "$REPLY" =~ ^\~/ ]]; then
+            break
+        else
+            echo "$2\n"
+        fi
+    done
 }
