@@ -8,6 +8,8 @@ declare -r DOTFILES_ORIGIN="git@github.com:$GITHUB_REPOSITORY.git"
 declare -r DOTFILES_TARBALL_URL="https://github.com/$GITHUB_REPOSITORY/tarball/main"
 declare -r DOTFILES_UTILS_URL="https://raw.githubusercontent.com/$GITHUB_REPOSITORY/main/src/os/utils.sh"
 
+declare default_dotfiles_directory="$HOME/projects/dotfiles"
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 download() {
@@ -43,6 +45,20 @@ download_utils() {
    return 1
 }
 
+extract() {
+
+    local archive="$1"
+    local outputDir="$2"
+
+    if command -v "tar" &> /dev/null; then
+
+        tar --extract --gzip --file "$archive" --strip-components 1 --directory "$outputDir"
+        return $?
+    fi
+
+    return 1
+}
+
 download_dotfiles() {
 
     local tmpFile=""
@@ -54,66 +70,50 @@ download_dotfiles() {
     tmpFile="$(mktemp /tmp/XXXXX)"
 
     download "$DOTFILES_TARBALL_URL" "$tmpFile"
-    print_result $? "Download archive"
+    status $? "Download archive"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # if ! $skipQuestions; then
+    confirm_ask "\nDo you want to store the dotfiles in '$default_dotfiles_directory'?"
 
-    #     ask_for_confirmation "Do you want to store the dotfiles in '$default_dotfiles_directory'?"
+    if [ "$?" == 1 ]; then
+        ask_another_location "\nPlease specify another location for the configuration files (path):"
+        # Expand the tilde
+        default_dotfiles_directory=$(eval echo "$(get_answer)")
+    fi
 
-    #     if ! answer_is_yes; then
-    #         default_dotfiles_directory=""
-    #         while [ -z "$default_dotfiles_directory" ]; do
-    #             ask "Please specify another location for the dotfiles (path): "
-    #             default_dotfiles_directory="$(get_answer)"
-    #         done
-    #     fi
+    # Check if the directory exists
+    while [ -d "$default_dotfiles_directory" ]; do
+        confirm_ask "\n'$default_dotfiles_directory' already exists, do you want to overwrite it?"
+        
+        if [ "$?" == 1 ]; then
+            ask_another_location "\nPlease specify another location for the configuration files (path):"
+            # Expand the tilde
+            default_dotfiles_directory=$(eval echo "$(get_answer)")
+        else
+            rm -rf "$default_dotfiles_directory"
+            break
+        fi
+    done
 
-    #     # Ensure the `dotfiles` directory is available
+    mkdir -p "$default_dotfiles_directory"
+    status $? "Create '$default_dotfiles_directory'"
 
-    #     while [ -e "$default_dotfiles_directory" ]; do
-    #         ask_for_confirmation "'$default_dotfiles_directory' already exists, do you want to overwrite it?"
-    #         if answer_is_yes; then
-    #             rm -rf "$default_dotfiles_directory"
-    #             break
-    #         else
-    #             default_dotfiles_directory=""
-    #             while [ -z "$default_dotfiles_directory" ]; do
-    #                 ask "Please specify another location for the dotfiles (path): "
-    #                 default_dotfiles_directory="$(get_answer)"
-    #             done
-    #         fi
-    #     done
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    #     printf "\n"
+    # Extract archive in the `dotfiles` directory.
 
-    # else
+    extract "$tmpFile" "$default_dotfiles_directory"
+    status $? "Extract archive"
 
-    #     rm -rf "$default_dotfiles_directory" &> /dev/null
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # fi
+    rm -rf "$tmpFile"
+    status $? "Remove archive"
 
-    # mkdir -p "$default_dotfiles_directory"
-    # print_result $? "Create '$default_dotfiles_directory'" "true"
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    # # Extract archive in the `dotfiles` directory.
-
-    # extract "$tmpFile" "$default_dotfiles_directory"
-    # print_result $? "Extract archive" "true"
-
-    # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    # rm -rf "$tmpFile"
-    # print_result $? "Remove archive"
-
-    # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    # cd "$default_dotfiles_directory/src/os" \
-    #     || return 1
-
+    cd "$default_dotfiles_directory/src/os" || return 1
 }
 
 # ----------------------------------------------------------------------
@@ -126,7 +126,7 @@ main() {
     # are made relative to this file's path.
 
     cd "$(dirname "${BASH_SOURCE[0]}")" \
-        || exit 1
+    || exit 1
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -157,6 +157,8 @@ main() {
 
     echo "${BASH_SOURCE[0]}" | grep "setup.sh" &> /dev/null \
     || download_dotfiles
+    
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
 
 main "$@"

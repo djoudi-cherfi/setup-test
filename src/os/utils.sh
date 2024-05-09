@@ -92,6 +92,20 @@ check_supported_os_version() {
     echo "$erro_message"
 }
 
+# ----------------------------------------------------------------------
+# | Status                                                             |
+# ----------------------------------------------------------------------
+
+status() {
+
+    if [ "$1" -eq 0 ]; then
+        echo "[✔] $2"
+    else
+        echo "[✖] $2"
+    fi
+
+    return "$1"
+}
 
 # ----------------------------------------------------------------------
 # | Question / Answer                                                  |
@@ -99,7 +113,7 @@ check_supported_os_version() {
 
 ask() {
     echo "$1"
-    read -r
+    read -r -e
 }
 
 get_answer() {
@@ -109,7 +123,7 @@ get_answer() {
 confirm_ask() {
 
     while true; do
-        ask "$1"
+        ask "$1 (y/n)"
 
         case "$REPLY" in
             [yY])
@@ -119,7 +133,8 @@ confirm_ask() {
                 return 1
                 ;;
             *)
-                echo "$2\n"
+                echo "Invalid:"
+                echo "Please respond with 'y' (yes) or 'n' (no)."
                 ;;
         esac
     done
@@ -129,11 +144,13 @@ ask_another_location() {
 
     while true; do
         ask "$1"
-        
-        if [[ "$REPLY" =~ ^\~/ ]]; then
+
+        if [[ "$REPLY" =~ ^\~/[a-zA-Z]+ ]]; then
             break
         else
-            echo "$2\n"
+            echo "Invalid:"
+            echo "- Enter a directory starting with '~/<path>'."
+            echo "- Only use letters A-Z (lowercase or uppercase) after '~/'."
         fi
     done
 }

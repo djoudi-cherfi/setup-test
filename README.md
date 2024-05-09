@@ -9,3 +9,5 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/djoudi-cherfi/setup-test/m
 - [x] download and run the utils file
 - [x] ask to run sudo
 - [x] check supported os version
+- [x] download dotfiles
+- [ ] create symbolic links
