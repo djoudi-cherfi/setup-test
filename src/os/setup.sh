@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "download and run the setup file"
+echo "download and run the setup file\n"
 
 declare -r GITHUB_REPOSITORY="djoudi-cherfi/setup-test"
 

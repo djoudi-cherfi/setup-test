@@ -48,3 +48,5 @@ create_symlinks() {
         fi
     done
 }
+
+create_symlinks
