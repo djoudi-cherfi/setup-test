@@ -96,7 +96,7 @@ check_supported_os_version() {
 # | Status                                                             |
 # ----------------------------------------------------------------------
 
-status() {
+display_status() {
 
     if [ "$1" -eq 0 ]; then
         echo "[✔] $2"

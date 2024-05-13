@@ -10,4 +10,5 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/djoudi-cherfi/setup-test/m
 - [x] ask to run sudo
 - [x] check supported os version
 - [x] download dotfiles
-- [ ] create symbolic links
+- [x] create symbolic links
+- [ ] create local config files

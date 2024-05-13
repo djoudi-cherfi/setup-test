@@ -70,7 +70,7 @@ download_dotfiles() {
     tmpFile="$(mktemp /tmp/XXXXX)"
 
     download "$DOTFILES_TARBALL_URL" "$tmpFile"
-    status $? "Download archive"
+    display_status $? "Download archive"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -97,19 +97,19 @@ download_dotfiles() {
     done
 
     mkdir -p "$default_dotfiles_directory"
-    status $? "Create '$default_dotfiles_directory'"
+    display_status $? "Create '$default_dotfiles_directory'"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     # Extract archive in the `dotfiles` directory.
 
     extract "$tmpFile" "$default_dotfiles_directory"
-    status $? "Extract archive"
+    display_status $? "Extract archive"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     rm -rf "$tmpFile"
-    status $? "Remove archive"
+    display_status $? "Remove archive"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -158,6 +158,10 @@ main() {
     echo "${BASH_SOURCE[0]}" | grep "setup.sh" &> /dev/null \
     || download_dotfiles
     
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    ./create_symbolic_links.sh
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
 
