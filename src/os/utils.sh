@@ -7,17 +7,19 @@
 ask_for_sudo() {
 
     # Ask for the administrator password upfront.
-    
-    sudo -v &> /dev/null
+    if sudo -v; then
 
-    # Update existing `sudo` time stamp
-    # until this script has finished.
-
+    # Keep-alive
+    # update existing `sudo` time stamp until `setup.sh` has finished
     while true; do
         sudo -n true
         sleep 60
         kill -0 "$$" || exit
-    done &> /dev/null &
+    done 2>/dev/null &
+        echo "Sudo credentials updated."
+    else
+        echo "Failed to obtain sudo credentials."
+    fi
 }
 
 # ----------------------------------------------------------------------
@@ -53,6 +55,7 @@ get_os_version() {
 # ----------------------------------------------------------------------
 
 compare_versions() {
+
     local version1=$1
     local version2=$2
 
@@ -98,6 +101,17 @@ compare_versions() {
     return 1
 }
 
+wait_for() {
+
+    local check_function="$1"
+    local name="$2"
+    
+    until $check_function; do
+        echo "Waiting for $name..."
+        sleep 5
+    done
+}
+
 # ----------------------------------------------------------------------
 # | Status                                                             |
 # ----------------------------------------------------------------------
@@ -121,8 +135,11 @@ display_status() {
 # ----------------------------------------------------------------------
 
 ask() {
-    echo -e "$1"
-    read -r -e
+
+    local prompt="$1"
+    
+    echo -e "$prompt"
+    read -r -e REPLY
 }
 
 get_answer() {
@@ -131,9 +148,11 @@ get_answer() {
 
 confirm_ask() {
 
+    local prompt="$1"
+    
     while true; do
-        ask "$1 (y/n)"
-        
+        ask "$prompt (y/n)"
+
         case "$REPLY" in
             [yY]) return 0 ;;
             [nN]) return 1 ;;
@@ -143,9 +162,11 @@ confirm_ask() {
 }
 
 ask_another_location() {
+    
+    local prompt="$1"
 
     while true; do
-        ask "$1"
+        ask "$prompt"
 
         if [[ "$REPLY" =~ ^\~/[a-zA-Z]+ ]]; then
             break

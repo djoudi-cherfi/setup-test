@@ -21,4 +21,4 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/djoudi-cherfi/setup-test/m
 ## Installs tools
 
 - [x] ./xcode.sh
-- [] ./homebrew.sh
+- [x] ./homebrew.sh

@@ -31,16 +31,12 @@ create_symlinks() {
         if [ ! -e "$target_file" ]; then
             ln -sf "$source_file" "$target_file"
             display_status "$?" "$source_file → $target_file"
-
         # Check if the existing target file points to the same source file.
         elif [ "$(readlink "$target_file")" == "$source_file" ]; then
             display_status "$?" "$source_file → $target_file"
-
         # Check if the target file already exists
         else
-            confirm_ask "\n'$target_file' already exists, do you want to overwrite it?"
-            
-            if [ "$?" == 0 ]; then
+            if confirm_ask "\n'$target_file' already exists, do you want to overwrite it?"; then
                 rm -rf "$target_file"
                 ln -sf "$source_file" "$target_file"
                 display_status "$?" "$source_file → $target_file"

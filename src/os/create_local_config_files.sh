@@ -9,7 +9,6 @@ create_gitconfig_local() {
     declare -r FILE_PATH="$HOME/.gitconfig.local"
 
     if [ ! -e "$FILE_PATH" ] || [ -z "$FILE_PATH" ]; then
-
         echo -e \
 "\n[commit]
     # Sign commits using GPG.
@@ -45,7 +44,6 @@ create_hushlogin() {
     fi
 
     display_status "$?" "$FILE_PATH"
-
 }
 
 echo -e "\n• Create local config files"

@@ -18,12 +18,9 @@ download() {
     local output="$2"
 
     if command -v "curl" &> /dev/null; then
-
         curl --location --silent --show-error --output "$output" "$url" &> /dev/null
         return $?
-
     elif command -v "wget" &> /dev/null; then
-
         wget --quiet --output-document="$output" "$url" &> /dev/null
         return $?
     fi
@@ -34,7 +31,6 @@ download() {
 download_utils() {
 
     local tmpFile=""
-
     tmpFile="$(mktemp /tmp/XXXXX)"
 
     download "$DOTFILES_UTILS_URL" "$tmpFile" \
@@ -77,7 +73,6 @@ extract() {
     local outputDir="$2"
 
     if command -v "tar" &> /dev/null; then
-
         tar --extract --gzip --file "$archive" --strip-components 1 --directory "$outputDir"
         return $?
     fi
@@ -100,20 +95,18 @@ download_dotfiles() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    confirm_ask "\nDo you want to store the dotfiles in '$default_dotfiles_directory'?"
-
-    if [ "$?" == 1 ]; then
+    if ! confirm_ask "\nDo you want to store the dotfiles in '$default_dotfiles_directory'?"; then
         ask_another_location "\nPlease specify another location for the configuration files (path):"
+        
         # Expand the tilde
         default_dotfiles_directory=$(eval echo "$(get_answer)")
     fi
 
     # Check if the directory exists
     while [ -d "$default_dotfiles_directory" ]; do
-        confirm_ask "\n'$default_dotfiles_directory' already exists, do you want to overwrite it?"
-        
-        if [ "$?" == 1 ]; then
+        if ! confirm_ask "\n'$default_dotfiles_directory' already exists, do you want to overwrite it?"; then
             ask_another_location "\nPlease specify another location for the configuration files (path):"
+            
             # Expand the tilde
             default_dotfiles_directory=$(eval echo "$(get_answer)")
         else
