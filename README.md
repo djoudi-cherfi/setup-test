@@ -1,4 +1,4 @@
-# Structure du projet
+# Test dotfiles
 
 ## 🚀 Download and run the setup file
 
