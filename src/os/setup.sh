@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "download and run the setup file\n"
+echo -e "download and run the setup file\n"
 
 declare -r GITHUB_REPOSITORY="djoudi-cherfi/setup-test"
 
@@ -43,6 +43,32 @@ download_utils() {
         && return 0
 
    return 1
+}
+
+check_supported_os_version() {
+
+    local os_name="$(get_os_name)"
+    local os_version_default="$(get_os_version)"
+
+    case "$os_name" in
+        "macos")
+            local -r minimum_version="10.15"
+            ;;
+        "ubuntu")
+            local -r minimum_version="20.04"
+            ;;
+        *)
+            display_status 1 "Sorry, this script is intended only for macOS and Ubuntu!"
+            exit 1
+            ;;
+    esac
+
+    if compare_versions "$os_version_default" "$minimum_version"; then
+        display_status 1 "Sorry, this script is intended only for $os_name $minimum_version and newer."
+        exit 1
+    else
+        display_status 0 "OS version is supported."
+    fi
 }
 
 extract() {
@@ -125,8 +151,7 @@ main() {
     # Ensure that the following actions
     # are made relative to this file's path.
 
-    cd "$(dirname "${BASH_SOURCE[0]}")" \
-    || exit 1
+    cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -147,7 +172,7 @@ main() {
     # Checks that the operating system is supported
     # and higher than the required version.
 
-    check_supported_os_version || exit 1
+    check_supported_os_version
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -161,6 +186,10 @@ main() {
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     ./create_symbolic_links.sh
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    ./create_local_config_files.sh
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

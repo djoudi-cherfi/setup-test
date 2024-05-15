@@ -26,20 +26,13 @@ ask_for_sudo() {
 
 get_os_name() {
 
-    local os_name=""
     local kernel_name="$(uname -s)"
-
-    if [ "$kernel_name" == "Darwin" ]; then
-        os_name="macos"
-
-    elif [ "$(expr substr $kernel_name 1 5)" == "Linux" ]; then
-        os_name="ubuntu"
-
-    else
-        os_name="$kernel_name"
-    fi
-
-    echo "$os_name"
+    
+    case "$kernel_name" in
+        Darwin) echo "macos" ;;
+        Linux) echo "ubuntu" ;;
+        *) echo "$kernel_name" ;;
+    esac
 }
 
 get_os_version() {
@@ -47,49 +40,62 @@ get_os_version() {
     local os_name="$(get_os_name)"
     local os_version_default=""
 
-    if [ "$os_name" == "macos" ]; then
-        os_version_default="$(sw_vers -productVersion)"
-        
-    elif [ "$os_name" == "ubuntu" ]; then
-        os_version_default="$(lsb_release -rs)"
-    fi
+    case "$os_name" in
+        "macos") os_version_default="$(sw_vers -productVersion)" ;;
+        "ubuntu") os_version_default="$(lsb_release -rs)" ;;
+    esac
 
     echo "$os_version_default"
 }
 
-check_supported_os_version() {
+# ----------------------------------------------------------------------
+# | CMD                                                                |
+# ----------------------------------------------------------------------
 
-    local os_name="$(get_os_name)"
-    local os_version_default="$(get_os_version)"
+compare_versions() {
+    local version1=$1
+    local version2=$2
 
-    # Substring extraction
-    local os_version=${os_version_default:0:2}
+    # Extract major, minor, and patch parts
+    IFS='.' read -r major1 minor1 patch1 <<< "$version1"
+    IFS='.' read -r major2 minor2 patch2 <<< "$version2"
 
-    local -r minimum_macos_version="10.10"
-    local -r minimum_ubuntu_version="20.04"
+    # Remove leading zeros
+    major1=$(echo "$major1" | sed 's/^0*//')
+    minor1=$(echo "$minor1" | sed 's/^0*//')
+    patch1=$(echo "$patch1" | sed 's/^0*//')
+    major2=$(echo "$major2" | sed 's/^0*//')
+    minor2=$(echo "$minor2" | sed 's/^0*//')
+    patch2=$(echo "$patch2" | sed 's/^0*//')
 
+    # Initialize values if empty
+    major1=${major1:-0}
+    minor1=${minor1:-0}
+    patch1=${patch1:-0}
+    major2=${major2:-0}
+    minor2=${minor2:-0}
+    patch2=${patch2:-0}
 
-    if [ "$os_name" == "macos" ]; then
-
-        if [ "$(echo "$os_version >= $minimum_macos_version" | bc)" -eq 1 ]; then
-            return 0
-        else
-            erro_message="Sorry, this script is intended only for $os_name $minimum_macos_version and +."
-        fi
-
-    elif [ "$os_name" == "ubuntu" ]; then
-        
-        if [ "$(echo "$os_version >= $minimum_ubuntu_version" | bc)" -eq 1 ]; then
-            return 0
-        else
-            erro_message="Sorry, this script is intended only for $os_name $minimum_ubuntu_version and +."
-        fi
-        
-    else
-        erro_message="Sorry, this script is intended only for macos and ubuntu!"
+    # Compare each part of the versions
+    if (( major1 < major2 )); then
+        return 0
+    elif (( major1 > major2 )); then
+        return 1
     fi
 
-    echo "$erro_message"
+    if (( minor1 < minor2 )); then
+        return 0
+    elif (( minor1 > minor2 )); then
+        return 1
+    fi
+
+    if (( patch1 < patch2 )); then
+        return 0
+    elif (( patch1 > patch2 )); then
+        return 1
+    fi
+
+    return 1
 }
 
 # ----------------------------------------------------------------------
@@ -98,13 +104,16 @@ check_supported_os_version() {
 
 display_status() {
 
-    if [ "$1" -eq 0 ]; then
-        echo "[✔] $2"
+    local status="$1"
+    local message="$2"
+
+    if [ "$status" -eq 0 ]; then
+        echo "[✔] $message"
     else
-        echo "[✖] $2"
+        echo "[✖] $message"
     fi
 
-    return "$1"
+    return "$status"
 }
 
 # ----------------------------------------------------------------------
@@ -124,18 +133,11 @@ confirm_ask() {
 
     while true; do
         ask "$1 (y/n)"
-
+        
         case "$REPLY" in
-            [yY])
-                return 0
-                ;;
-            [nN])
-                return 1
-                ;;
-            *)
-                echo "Invalid:"
-                echo "Please respond with 'y' (yes) or 'n' (no)."
-                ;;
+            [yY]) return 0 ;;
+            [nN]) return 1 ;;
+            *) echo "Invalid response. Please respond with 'y' (yes) or 'n' (no)." ;;
         esac
     done
 }
@@ -148,7 +150,7 @@ ask_another_location() {
         if [[ "$REPLY" =~ ^\~/[a-zA-Z]+ ]]; then
             break
         else
-            echo "Invalid:"
+            echo "Invalid response."
             echo "- Enter a directory starting with '~/<path>'."
             echo "- Only use letters A-Z (lowercase or uppercase) after '~/'."
         fi

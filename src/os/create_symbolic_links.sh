@@ -49,4 +49,6 @@ create_symlinks() {
     done
 }
 
+echo -e "\n• Create symbolic links"
+
 create_symlinks
