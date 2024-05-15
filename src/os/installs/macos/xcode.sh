@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+cd "$(dirname "${BASH_SOURCE[0]}")" && . "../../utils.sh"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 is_xcode_installed() {
     
     xcode-select -p &> /dev/null

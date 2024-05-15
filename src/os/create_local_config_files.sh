@@ -2,6 +2,8 @@
 
 cd "$(dirname "${BASH_SOURCE[0]}")" && . "utils.sh"
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 create_gitconfig_local() {
 
     declare -r FILE_PATH="$HOME/.gitconfig.local"
