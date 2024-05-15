@@ -7,4 +7,4 @@ cd "$(dirname "${BASH_SOURCE[0]}")" \
 
 echo -e "\n• Installs"
 
-"./$(get_os)/main.sh"
+"./$(get_os_name)/main.sh"
