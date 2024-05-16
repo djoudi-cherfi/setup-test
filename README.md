@@ -22,3 +22,4 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/djoudi-cherfi/setup-test/m
 
 - [x] ./xcode.sh
 - [x] ./homebrew.sh
+- [ ] ./check_and_install_packages.sh

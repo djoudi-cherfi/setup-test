@@ -116,18 +116,46 @@ wait_for() {
 # | Status                                                             |
 # ----------------------------------------------------------------------
 
+execute() {
+
+    local -r cmd="$1"
+    local -r msg="${2:-$1}"
+    
+    $cmd >/dev/null 2>&1 &
+    local pid=$!
+    show_spinner "$pid" "$msg"
+    wait "$pid" &> /dev/null
+    display_status "$?" "$msg"
+}
+
 display_status() {
 
     local status="$1"
     local message="$2"
-
+    
     if [ "$status" -eq 0 ]; then
         echo "[✔] $message"
     else
         echo "[✖] $message"
     fi
-
+    
     return "$status"
+}
+
+show_spinner() {
+
+    local pid=$1
+    local msg=$2
+    local delay=0.1
+    local spinstr='-\|/'
+
+    while kill -0 "$pid" 2>/dev/null; do
+        local temp=${spinstr#?}
+        echo -n "[${spinstr:0:1}] $msg"
+        local spinstr=$temp${spinstr%"$temp"}
+        sleep $delay
+        echo -ne "\r"
+    done
 }
 
 # ----------------------------------------------------------------------
