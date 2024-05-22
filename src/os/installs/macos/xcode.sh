@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-cd "$(dirname "${BASH_SOURCE[0]}")" && . "../../utils.sh"
+cd "$(dirname "${BASH_SOURCE[0]}")" \
+    && . "../../utils.sh"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -55,5 +56,7 @@ install_xcode() {
 
     install_command_line_tools
 }
+
+echo -e "\n• Install xcode"
 
 install_xcode

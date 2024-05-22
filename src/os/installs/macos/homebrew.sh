@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-cd "$(dirname "${BASH_SOURCE[0]}")" && . "../../utils.sh"
+cd "$(dirname "${BASH_SOURCE[0]}")" \
+    && . "../../utils.sh"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -50,5 +51,7 @@ install_homebrew() {
     
     ask_update_upgrade_homebrew
 }
+
+echo -e "\n• Install homebrew"
 
 install_homebrew
