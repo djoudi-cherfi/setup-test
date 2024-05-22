@@ -1,3 +1,5 @@
+#!/usr/bin/env osascript
+
 on run argv
     -- Get the app ID from the arguments
     set appID to item 1 of argv

@@ -29,4 +29,23 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/djoudi-cherfi/setup-test/m
 
 ## Preferences os
 
-- [ ] ./preferences/main.sh
+- [x] ./close_system_preferences_panes.applescript
+- [ ] ./delete_ds_store.sh
+- [ ] ./dock.sh
+- [ ] ./finder.sh
+- [ ] ./brave.sh
+- [ ] ./keyboard.sh
+- [ ] ./language_and_region.sh
+- [ ] ./maps.sh
+- [ ] ./panels.sh
+- [ ] ./photos.sh
+- [ ] ./safari.sh
+- [ ] ./screenshots.sh
+- [ ] ./security_and_privacy.sh
+- [ ] ./siri.sh
+- [ ] ./spaces.sh
+- [ ] ./sound.sh
+- [ ] ./terminal.sh
+- [ ] ./textedit.sh
+- [ ] ./mouse.sh
+- [ ] ./ui_and_ux.sh
