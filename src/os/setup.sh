@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-echo -e "download and run the setup file\n"
-
 declare -r GITHUB_REPOSITORY="djoudi-cherfi/setup-test"
 
 declare -r DOTFILES_ORIGIN="git@github.com:$GITHUB_REPOSITORY.git"
@@ -16,6 +14,8 @@ download() {
 
     local url="$1"
     local output="$2"
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     if command -v "curl" &> /dev/null; then
         curl --location --silent --show-error --output "$output" "$url" &> /dev/null
@@ -33,6 +33,8 @@ download_utils() {
     local tmpFile=""
     tmpFile="$(mktemp /tmp/XXXXX)"
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
     download "$DOTFILES_UTILS_URL" "$tmpFile" \
         && . "$tmpFile" \
         && rm -rf "$tmpFile" \
@@ -46,6 +48,8 @@ check_supported_os_version() {
     local os_name="$(get_os_name)"
     local os_version_default="$(get_os_version)"
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
     case "$os_name" in
         "macos")
             local -r minimum_version="10.15"
@@ -54,16 +58,16 @@ check_supported_os_version() {
             local -r minimum_version="20.04"
             ;;
         *)
-            display_status 1 "Sorry, this script is intended only for macOS and Ubuntu!"
+            print_result 1 "Sorry, this script is intended only for macOS and Ubuntu!"
             exit 1
             ;;
     esac
 
     if compare_versions "$os_version_default" "$minimum_version"; then
-        display_status 1 "Sorry, this script is intended only for $os_name $minimum_version and newer."
+        print_result 1 "Sorry, this script is intended only for $os_name $minimum_version and newer."
         exit 1
     else
-        display_status 0 "OS version is supported."
+        print_result 0 "OS version is supported."
     fi
 }
 
@@ -71,6 +75,8 @@ extract() {
 
     local archive="$1"
     local outputDir="$2"
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     if command -v "tar" &> /dev/null; then
         tar --extract --gzip --file "$archive" --strip-components 1 --directory "$outputDir"
@@ -86,12 +92,12 @@ download_dotfiles() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    echo "• Download and extract archive"
+    echo -e "\n • Download and extract archive"
 
     tmpFile="$(mktemp /tmp/XXXXX)"
 
     download "$DOTFILES_TARBALL_URL" "$tmpFile"
-    display_status $? "Download archive"
+    print_result $? "Download archive"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -116,19 +122,19 @@ download_dotfiles() {
     done
 
     mkdir -p "$default_dotfiles_directory"
-    display_status $? "Create '$default_dotfiles_directory'"
+    print_result $? "Create '$default_dotfiles_directory'"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     # Extract archive in the `dotfiles` directory.
 
     extract "$tmpFile" "$default_dotfiles_directory"
-    display_status $? "Extract archive"
+    print_result $? "Extract archive"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     rm -rf "$tmpFile"
-    display_status $? "Remove archive"
+    print_result $? "Remove archive"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -155,6 +161,10 @@ main() {
     else
         download_utils || exit 1
     fi
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    print_yellow "\n + Download and run the setup file +"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -191,6 +201,10 @@ main() {
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     ./preferences/main.sh
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    print_warning "Installation complete, restart the computer...."
     
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

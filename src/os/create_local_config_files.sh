@@ -9,6 +9,8 @@ create_gitconfig_local() {
 
     declare -r FILE_PATH="$HOME/.gitconfig.local"
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
     if [ ! -e "$FILE_PATH" ] || [ -z "$FILE_PATH" ]; then
         echo -e \
 "\n[commit]
@@ -22,32 +24,38 @@ create_gitconfig_local() {
     email =" >> "$FILE_PATH"
     fi
 
-    display_status "$?" "$FILE_PATH"
+    print_result "$?" "$FILE_PATH"
 }
 
 create_vimrc_local() {
 
     declare -r FILE_PATH="$HOME/.vimrc.local"
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
     if [ ! -e "$FILE_PATH" ]; then
         echo "" >> "$FILE_PATH"
     fi
 
-    display_status "$?" "$FILE_PATH"
+    print_result "$?" "$FILE_PATH"
 }
 
 create_hushlogin() {
 
     declare -r FILE_PATH="$HOME/.hushlogin"
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
     if [ ! -e "$FILE_PATH" ]; then
         echo "" >> "$FILE_PATH"
     fi
 
-    display_status "$?" "$FILE_PATH"
+    print_result "$?" "$FILE_PATH"
 }
 
-echo -e "\n• Create local config files"
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+print_title "Create local config files"
 
 create_gitconfig_local
 create_vimrc_local

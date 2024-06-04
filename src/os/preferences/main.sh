@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
-cd "$(dirname "${BASH_SOURCE[0]}")" \
-    && . "../utils.sh"
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-echo -e "\n• Preferences"
+print_title "Preferences"
 
 "./$(get_os_name)/main.sh"

@@ -7,10 +7,14 @@ cd "$(dirname "${BASH_SOURCE[0]}")" \
 
 BREW_FILE="${BREW_FILE:-Brewfile}"
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 uninstall_package() {
     
     local package_type="$1"
     local package_name="$2"
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     case "$package_type" in
         "tap")
@@ -25,10 +29,10 @@ uninstall_package() {
 check_and_uninstall_packages() {
 
     if [ ! -f "$BREW_FILE" ]; then
-        display_status 1 "$BREW_FILE not found..."
+        print_result 1 "$BREW_FILE not found..."
         exit 1
     else
-        display_status 0 "Running $BREW_FILE found..."
+        print_result 0 "Running $BREW_FILE found..."
     fi
 
     while IFS= read -r line; do
@@ -55,6 +59,8 @@ check_and_uninstall_packages() {
     done < "$BREW_FILE"
 }
 
-echo -e "\n• Uninstall packages from homebrew"
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+print_subtitle "Uninstall packages from homebrew"
 
 check_and_uninstall_packages

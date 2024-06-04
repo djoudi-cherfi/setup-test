@@ -29,23 +29,32 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/djoudi-cherfi/setup-test/m
 
 ## Preferences os
 
-- [x] ./close_system_preferences_panes.applescript
-- [ ] ./delete_ds_store.sh
-- [ ] ./dock.sh
-- [ ] ./finder.sh
-- [ ] ./brave.sh
-- [ ] ./keyboard.sh
-- [ ] ./language_and_region.sh
-- [ ] ./maps.sh
-- [ ] ./panels.sh
-- [ ] ./photos.sh
-- [ ] ./safari.sh
-- [ ] ./screenshots.sh
-- [ ] ./security_and_privacy.sh
-- [ ] ./siri.sh
+- [x] ./close_system_preferences_panes.sh
+- [x] ./delete_ds_store.sh
+- [x] ./files.sh
+- [x] ./fonts.sh
+- [x] ./displays.sh
+- [x] ./dock.sh
+- [x] ./finder.sh
+- [x] ./keyboard.sh
+- [x] ./language_and_region.sh
+- [x] ./mouse.sh
+- [x] ./panels.sh
+- [x] ./screenshots.sh
+- [x] ./siri.sh
 - [ ] ./spaces.sh
-- [ ] ./sound.sh
-- [ ] ./terminal.sh
-- [ ] ./textedit.sh
-- [ ] ./mouse.sh
-- [ ] ./ui_and_ux.sh
+- [x] ./sound.sh
+- [ ] ./trackpad.sh
+- [x] ./ui_and_ux.sh
+- [x] ./wallpaper.sh
+- [x] ./window.sh
+- [x] ./safari.sh
+- [ ] ./brave.sh
+- [x] ./textedit.sh
+- [x] ./notes.sh
+- [x] ./terminal.sh
+
+## To do
+
+- Auto install app indesign, photoshop, illustrator...
+- Add app to the dock

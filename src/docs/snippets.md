@@ -24,6 +24,16 @@ tell application "System Events"
 end tell
 ```
 
+## Get Pane macos
+
+Version 1
+
+```applescript
+tell application "System Settings"
+	get every anchor of current pane
+end tell
+```
+
 ## Get Process macos
 
 Version 1
@@ -88,6 +98,42 @@ tell application "System Events"
 			
 			get every menu item of every menu of every menu item of every menu of every menu bar item
 		end tell
+	end tell
+end tell
+```
+
+## Get attribute of every UI element macos
+
+Version 1
+
+```applescript
+get attribute of every button of UI element 1
+	of scroll area 2 of group 1 of group 2 of splitter group 1 of group 1 of window 1
+```
+
+## Get UI element macos
+
+Version 1
+
+```applescript
+tell application "System Events"
+	tell application process "Notes"
+	
+		get UI element of group 1 of window "Réglages"
+		
+	end tell
+end tell
+```
+
+Version 2
+
+```applescript
+tell application "System Events"
+	tell application process "Notes"
+	
+		click menu item 24 of menu 1 of menu bar item 5 of menu bar 1
+		get UI element of group 1 of window "desktop"
+
 	end tell
 end tell
 ```

@@ -24,7 +24,7 @@ ask_install_homebrew() {
         execute is_homebrew_installed "Homebrew has been installed."
         return 0
     else
-        display_status 1 "Installation of Homebrew canceled."
+        print_result 1 "Installation of Homebrew canceled."
         return 1
     fi
 }
@@ -36,7 +36,7 @@ ask_update_upgrade_homebrew() {
         execute is_homebrew_upgraded "Homebrew has been upgraded."
         return 0
     else
-        display_status 1 "Update and upgrade of Homebrew canceled."
+        print_result 1 "Update and upgrade of Homebrew canceled."
         return 1
     fi
 }
@@ -44,7 +44,7 @@ ask_update_upgrade_homebrew() {
 install_homebrew() {
 
     if is_homebrew_installed; then
-        display_status 0 "Homebrew is already installed."
+        print_result 0 "Homebrew is already installed."
     else
         ask_install_homebrew || return 1
     fi
@@ -52,6 +52,8 @@ install_homebrew() {
     ask_update_upgrade_homebrew
 }
 
-echo -e "\n• Install homebrew"
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+print_subtitle "Install homebrew"
 
 install_homebrew

@@ -24,7 +24,10 @@ create_symlinks() {
         "vim/vimrc"
     )
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
     for file in "${files_to_symlink[@]}"; do
+
         local source_file="$(cd .. && pwd)/$file"
         local target_file="$HOME/.$(basename "$file")"
 
@@ -33,19 +36,21 @@ create_symlinks() {
             execute "ln -sf $source_file $target_file" "$source_file → $target_file"
         # Check if the existing target file points to the same source file.
         elif [ "$(readlink "$target_file")" == "$source_file" ]; then
-            display_status "$?" "$source_file → $target_file"
+            print_result "$?" "$source_file → $target_file"
         # Check if the target file already exists
         else
             if confirm_ask "\n'$target_file' already exists, do you want to overwrite it?"; then
                 rm -rf "$target_file"
                 execute "ln -sf $source_file $target_file" "$source_file → $target_file"
             else
-                display_status "$?" "$source_file → $target_file"
+                print_result "$?" "$source_file → $target_file"
             fi
         fi
     done
 }
 
-echo -e "\n• Create symbolic links"
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+print_title "Create symbolic links"
 
 create_symlinks

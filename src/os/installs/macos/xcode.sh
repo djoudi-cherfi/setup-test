@@ -20,7 +20,7 @@ ask_install_xcode() {
         execute is_xcode_installed "Xcode has been installed."
         return 0
     else
-        display_status 1 "Installation of Xcode canceled."
+        print_result 1 "Installation of Xcode canceled."
         return 1
     fi
 }
@@ -32,7 +32,7 @@ ask_install_command_line_tools() {
         execute is_command_line_tools_installed "Xcode Command Line Tools have been installed."
         return 0
     else
-        display_status 1 "Installation of Xcode Command Line Tools canceled."
+        print_result 1 "Installation of Xcode Command Line Tools canceled."
         return 1
     fi
 }
@@ -40,7 +40,7 @@ ask_install_command_line_tools() {
 install_command_line_tools() {
 
     if is_command_line_tools_installed; then
-        display_status 0 "Xcode Command Line Tools are already installed."
+        print_result 0 "Xcode Command Line Tools are already installed."
     else
         ask_install_command_line_tools
     fi
@@ -49,7 +49,7 @@ install_command_line_tools() {
 install_xcode() {
 
     if is_xcode_installed; then
-        display_status 0 "Xcode is already installed."
+        print_result 0 "Xcode is already installed."
     else
         ask_install_xcode || return 1
     fi
@@ -57,6 +57,8 @@ install_xcode() {
     install_command_line_tools
 }
 
-echo -e "\n• Install xcode"
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+print_subtitle "Install xcode"
 
 install_xcode

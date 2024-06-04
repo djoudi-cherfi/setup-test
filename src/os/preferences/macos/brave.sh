@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
+cd "$(dirname "${BASH_SOURCE[0]}")" \
+    && . "../../utils.sh"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-print_title "Installs"
-
-"./$(get_os_name)/main.sh"
+print_subtitle "Brave"
