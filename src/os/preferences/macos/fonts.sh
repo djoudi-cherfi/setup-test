@@ -7,5 +7,5 @@ cd "$(dirname "${BASH_SOURCE[0]}")" \
 
 print_subtitle "Fonts"
 
-execute "cp -R "../fonts/Fura-Mono-Regular-Nerd-Font-Complete.otf" "${HOME}/Library/Fonts"" \
+execute "cp -R "../assets/fonts/Fura-Mono-Regular-Nerd-Font-Complete.otf" "${HOME}/Library/Fonts"" \
     "Install Font Fura Mono Nerd in ${HOME}/Library/Fonts"

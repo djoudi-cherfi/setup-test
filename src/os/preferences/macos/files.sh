@@ -31,9 +31,17 @@ execute "duti -s com.microsoft.VSCode .json all" \
 execute "duti -s com.microsoft.VSCode .md all" \
     "duti -s com.microsoft.VSCode .md all"
 
+# .pdf
+execute "duti -s com.adobe.Acrobat.Pro .pdf all" \
+    "duti -s com.adobe.Acrobat.Pro .pdf all"
+
 # .php
 execute "duti -s com.microsoft.VSCode .php all" \
     "duti -s com.microsoft.VSCode .php all"
+
+# .png
+execute "duti -s com.adobe.Photoshop .png all" \
+    "duti -s com.adobe.Photoshop .png all"
 
 # .sh
 execute "duti -s com.microsoft.VSCode .sh all" \
