@@ -7,6 +7,7 @@ declare -r DOTFILES_TARBALL_URL="https://github.com/$GITHUB_REPOSITORY/tarball/m
 declare -r DOTFILES_UTILS_URL="https://raw.githubusercontent.com/$GITHUB_REPOSITORY/main/src/os/utils.sh"
 
 declare default_dotfiles_directory="$HOME/projects/dotfiles"
+declare skipQuestions=false
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -17,10 +18,10 @@ download() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    if command -v "curl" &> /dev/null; then
+    if cmd_exists "curl"; then
         curl --location --silent --show-error --output "$output" "$url" &> /dev/null
         return $?
-    elif command -v "wget" &> /dev/null; then
+    elif cmd_exists "wget"; then
         wget --quiet --output-document="$output" "$url" &> /dev/null
         return $?
     fi
@@ -78,7 +79,7 @@ extract() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    if command -v "tar" &> /dev/null; then
+    if cmd_exists "tar"; then
         tar --extract --gzip --file "$archive" --strip-components 1 --directory "$outputDir"
         return $?
     fi
@@ -101,25 +102,31 @@ download_dotfiles() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    if ! confirm_ask "\nDo you want to store the dotfiles in '$default_dotfiles_directory'?"; then
-        ask_another_location "\nPlease specify another location for the configuration files (path):"
-        
-        # Expand the tilde
-        default_dotfiles_directory=$(eval echo "$(get_answer)")
-    fi
+    if ! $skipQuestions; then
 
-    # Check if the directory exists
-    while [ -d "$default_dotfiles_directory" ]; do
-        if ! confirm_ask "\n'$default_dotfiles_directory' already exists, do you want to overwrite it?"; then
+        if ! confirm_ask "\nDo you want to store the dotfiles in '$default_dotfiles_directory'?"; then
             ask_another_location "\nPlease specify another location for the configuration files (path):"
             
             # Expand the tilde
             default_dotfiles_directory=$(eval echo "$(get_answer)")
-        else
-            rm -rf "$default_dotfiles_directory"
-            break
         fi
-    done
+
+        # Check if the directory exists
+        while [ -d "$default_dotfiles_directory" ]; do
+            if ! confirm_ask "\n'$default_dotfiles_directory' already exists, do you want to overwrite it?"; then
+                ask_another_location "\nPlease specify another location for the configuration files (path):"
+                
+                # Expand the tilde
+                default_dotfiles_directory=$(eval echo "$(get_answer)")
+            else
+                rm -rf "$default_dotfiles_directory"
+                break
+            fi
+        done
+
+    else
+        rm -rf "$default_dotfiles_directory" &> /dev/null
+    fi
 
     mkdir -p "$default_dotfiles_directory"
     print_result $? "Create '$default_dotfiles_directory'"
@@ -168,6 +175,10 @@ main() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+    skip_questions "$@" && skipQuestions=true
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
     ask_for_sudo
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -203,10 +214,26 @@ main() {
     ./preferences/main.sh
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    print_warning "Installation complete, restart the computer...."
     
+    if cmd_exists "git"; then
+
+        if [ "$(git config --get remote.origin.url)" != "$DOTFILES_ORIGIN" ]; then
+            ./initialize_git_repository.sh "$DOTFILES_ORIGIN" || return 1
+        fi
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        if ! $skipQuestions; then
+            ./update_content.sh
+        fi
+
+    fi
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    if ! $skipQuestions; then
+        ./restart.sh
+    fi
 }
 
 main "$@"

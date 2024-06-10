@@ -24,6 +24,12 @@ create_symlinks() {
         "vim/vimrc"
     )
 
+    local skipQuestions=false
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    skip_questions "$@" && skipQuestions=true
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     for file in "${files_to_symlink[@]}"; do
@@ -32,18 +38,22 @@ create_symlinks() {
         local target_file="$HOME/.$(basename "$file")"
 
         # Check if the target file does not exist
-        if [ ! -e "$target_file" ]; then
+        if [ ! -e "$target_file" ] || $skipQuestions; then
             execute "ln -sf $source_file $target_file" "$source_file → $target_file"
+            
         # Check if the existing target file points to the same source file.
         elif [ "$(readlink "$target_file")" == "$source_file" ]; then
             print_result "$?" "$source_file → $target_file"
+
         # Check if the target file already exists
         else
-            if confirm_ask "\n'$target_file' already exists, do you want to overwrite it?"; then
-                rm -rf "$target_file"
-                execute "ln -sf $source_file $target_file" "$source_file → $target_file"
-            else
-                print_result "$?" "$source_file → $target_file"
+            if ! $skipQuestions; then
+                if confirm_ask "\n'$target_file' already exists, do you want to overwrite it?"; then
+                    rm -rf "$target_file"
+                    execute "ln -sf $source_file $target_file" "$source_file → $target_file"
+                else
+                    print_result "$?" "$source_file → $target_file"
+                fi
             fi
         fi
     done

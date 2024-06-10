@@ -18,7 +18,7 @@ move_to_trash() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # Capture the results of the find command into an array variable
+    # Capture the results of find into an array variable
     IFS=$'\n' read -d '' -r -a files <<< "$(find "$search_path" -path "$TRASH_DIR"\* -prune -o \
         \( -name "$app_name" -o -name "$formatted_app_name" \) -print)"
 

@@ -1,10 +1,91 @@
 #!/usr/bin/env bash
 
 # ----------------------------------------------------------------------
+# | CMD                                                                |
+# ----------------------------------------------------------------------
+
+ask_for_sudo() {
+
+    # Ask for the administrator password upfront.
+    if sudo -v; then
+
+    # Keep-alive
+    # update existing `sudo` time stamp until `setup.sh` has finished
+    while true; do
+        sudo -n true
+        sleep 60
+        kill -0 "$$" || exit
+    done 2>/dev/null &
+        echo "Sudo credentials updated."
+    else
+        echo "Failed to obtain sudo credentials."
+    fi
+}
+
+compare_versions() {
+
+    local version1=$1
+    local version2=$2
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Extract major, minor, and patch parts
+    IFS='.' read -r major1 minor1 patch1 <<< "$version1"
+    IFS='.' read -r major2 minor2 patch2 <<< "$version2"
+
+    # Remove leading zeros
+    major1=$(echo "$major1" | sed 's/^0*//')
+    minor1=$(echo "$minor1" | sed 's/^0*//')
+    patch1=$(echo "$patch1" | sed 's/^0*//')
+    major2=$(echo "$major2" | sed 's/^0*//')
+    minor2=$(echo "$minor2" | sed 's/^0*//')
+    patch2=$(echo "$patch2" | sed 's/^0*//')
+
+    # Initialize values if empty
+    major1=${major1:-0}
+    minor1=${minor1:-0}
+    patch1=${patch1:-0}
+    major2=${major2:-0}
+    minor2=${minor2:-0}
+    patch2=${patch2:-0}
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Compare each part of the versions
+    if (( major1 < major2 )); then
+        return 0
+    elif (( major1 > major2 )); then
+        return 1
+    fi
+
+    if (( minor1 < minor2 )); then
+        return 0
+    elif (( minor1 > minor2 )); then
+        return 1
+    fi
+
+    if (( patch1 < patch2 )); then
+        return 0
+    elif (( patch1 > patch2 )); then
+        return 1
+    fi
+
+    return 1
+}
+
+cmd_exists() {
+    command -v "$1" &> /dev/null
+}
+
+is_git_repository() {
+    git rev-parse &> /dev/null
+}
+
+# ----------------------------------------------------------------------
 # | Colors                                                             |
 # ----------------------------------------------------------------------
 
-if command -v tput >/dev/null 2>&1; then
+if cmd_exists tput; then
   bold=$(tput bold)
   reset=$(tput sgr0)
   red=$(tput setaf 1)
@@ -61,14 +142,14 @@ print_warning() {
 print_result() {
 
     local -r status="$1"
-    local -r message="$2"
+    local -r msg="$2"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     if [ "$status" -eq 0 ]; then
-        print_success "$message"
+        print_success "$msg"
     else
-        print_error "$message"
+        print_error "$msg"
     fi
 
     return "$status"
@@ -89,6 +170,20 @@ print_subtitle() {
 # ----------------------------------------------------------------------
 # | Question / Answer                                                  |
 # ----------------------------------------------------------------------
+
+skip_questions() {
+
+     while :; do
+        case $1 in
+            -y|--yes) return 0;;
+                   *) break;;
+        esac
+        shift 1
+    done
+
+    return 1
+
+}
 
 ask() {
 
@@ -172,7 +267,7 @@ set_trap() {
 show_spinner() {
 
     local -r pid="$1"
-    local -r message="$2"
+    local -r msg="$2"
     local -r delay=0.1
     local -r spinstr='|/-\'
 
@@ -180,7 +275,7 @@ show_spinner() {
 
     while kill -0 "$pid" 2>/dev/null; do
         for ((i=0; i<${#spinstr}; i++)); do
-            echo -ne " [${spinstr:$i:1}] $message"
+            echo -ne " [${spinstr:$i:1}] $msg"
             sleep "$delay"
             echo -ne "\033[0K\r"
         done
@@ -189,10 +284,10 @@ show_spinner() {
 
 execute() {
 
-    local -r command="$1"
-    local -r message="$2"
+    local -r cmd="$1"
+    local -r msg="$2"
     local -r TMP_FILE="$(mktemp /tmp/XXXXX)"
-    local command_pid=""
+    local cmd_pid=""
     local status_code=0
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -203,25 +298,25 @@ execute() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # Run the command in the background
-    eval "$command" \
+    # Run the cmd in the background
+    eval "$cmd" \
         &> /dev/null \
         2> "$TMP_FILE" &
         
-    command_pid=$!
+    cmd_pid=$!
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    show_spinner "$command_pid" "$message"
+    show_spinner "$cmd_pid" "$msg"
 
-    # Wait for the command to finish
-    wait "$command_pid" &> /dev/null
+    # Wait for the cmd to finish
+    wait "$cmd_pid" &> /dev/null
     status_code=$?
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     # Print output based on what happened.
-    print_result "$status_code" "$message"
+    print_result "$status_code" "$msg"
 
     if [ $status_code -ne 0 ]; then
         error_stream < "$TMP_FILE"
@@ -264,88 +359,3 @@ get_os_version() {
     echo "$os_version_default"
 }
 
-# ----------------------------------------------------------------------
-# | CMD                                                                |
-# ----------------------------------------------------------------------
-
-ask_for_sudo() {
-
-    # Ask for the administrator password upfront.
-    if sudo -v; then
-
-    # Keep-alive
-    # update existing `sudo` time stamp until `setup.sh` has finished
-    while true; do
-        sudo -n true
-        sleep 60
-        kill -0 "$$" || exit
-    done 2>/dev/null &
-        echo "Sudo credentials updated."
-    else
-        echo "Failed to obtain sudo credentials."
-    fi
-}
-
-compare_versions() {
-
-    local version1=$1
-    local version2=$2
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    # Extract major, minor, and patch parts
-    IFS='.' read -r major1 minor1 patch1 <<< "$version1"
-    IFS='.' read -r major2 minor2 patch2 <<< "$version2"
-
-    # Remove leading zeros
-    major1=$(echo "$major1" | sed 's/^0*//')
-    minor1=$(echo "$minor1" | sed 's/^0*//')
-    patch1=$(echo "$patch1" | sed 's/^0*//')
-    major2=$(echo "$major2" | sed 's/^0*//')
-    minor2=$(echo "$minor2" | sed 's/^0*//')
-    patch2=$(echo "$patch2" | sed 's/^0*//')
-
-    # Initialize values if empty
-    major1=${major1:-0}
-    minor1=${minor1:-0}
-    patch1=${patch1:-0}
-    major2=${major2:-0}
-    minor2=${minor2:-0}
-    patch2=${patch2:-0}
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    # Compare each part of the versions
-    if (( major1 < major2 )); then
-        return 0
-    elif (( major1 > major2 )); then
-        return 1
-    fi
-
-    if (( minor1 < minor2 )); then
-        return 0
-    elif (( minor1 > minor2 )); then
-        return 1
-    fi
-
-    if (( patch1 < patch2 )); then
-        return 0
-    elif (( patch1 > patch2 )); then
-        return 1
-    fi
-
-    return 1
-}
-
-wait_for() {
-
-    local check_function="$1"
-    local name="$2"
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    
-    until $check_function; do
-        echo "Waiting for $name..."
-        sleep 5
-    done
-}
