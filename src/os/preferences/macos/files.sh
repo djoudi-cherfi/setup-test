@@ -23,6 +23,10 @@ execute "duti -s com.brave.browser .http all" \
 execute "duti -s com.microsoft.VSCode .html all" \
     "duti -s com.microsoft.VSCode .html all"
 
+# .jpeg
+execute "duti -s com.adobe.Photoshop .jpeg all" \
+    "duti -s com.adobe.Photoshop .jpeg all"
+
 # .json
 execute "duti -s com.microsoft.VSCode .json all" \
     "duti -s com.microsoft.VSCode .json all"

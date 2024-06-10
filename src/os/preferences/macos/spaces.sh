@@ -6,5 +6,3 @@ cd "$(dirname "${BASH_SOURCE[0]}")" \
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 print_subtitle "Spaces"
-
-echo "TODO"

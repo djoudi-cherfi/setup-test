@@ -7,37 +7,26 @@ cd "$(dirname "${BASH_SOURCE[0]}")" \
 
 print_subtitle "Window"
 
-
-add_folder_to_window_sidebar() {
-    local folderPath="$1"
-
-    osascript "./window_sidebar.applescript" "$folderPath"
-}
-
-execute "add_folder_to_window_sidebar "$HOME/Library"" \
-    "Add the user library to the sidebar"
-
-execute "add_folder_to_window_sidebar "$HOME/Projects"" \
-    "Add the projects to the sidebar"
-
-execute "add_folder_to_window_sidebar "$HOME/Screenshots"" \
-    "Add the Screenshots to the sidebar"
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 window_open_folder() {
 
     local folder_path="$1"
 
-    osascript "./window_open_folder.applescript" "$folder_path"
+    ./window_open_folder.applescript "$folder_path"
 }
 
-window_display_by_column() {
+window_close_folder() {
 
-    osascript "./window_display_by_column.applescript"
+    ./window_close_folder.applescript
 }
 
-window_presentation_by_column() {
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+window_by_column() {
+
+    ./window_by_column.applescript
+}
+
+window_presentation_options_by_column() {
     
     local folder_path="$1"
 
@@ -45,17 +34,14 @@ window_presentation_by_column() {
 
     touch "$OUTPUT_FILE"
 
-    execute "window_open_folder $folder_path" \
-        "Window open folder $folder_path"
+    window_open_folder "$folder_path"
 
-    execute "window_display_by_column" \
-        "window display by column"
+    window_by_column
 
-    execute "./window_presentation_by_column.applescript" \
-        "Run window_presentation_by_column.applescript"
+    execute "./window_presentation_options_by_column.applescript" \
+        "Shows presentation options by column: $folder_path"
 
-    execute "./window_close_folder.applescript" \
-        "Close folder window if it exists"
+    window_close_folder
 
     while IFS='=' read -r key value; do
         
@@ -97,15 +83,49 @@ window_presentation_by_column() {
     rm -rf "$OUTPUT_FILE"
 }
 
-window_presentation_by_column "/Applications"
-window_presentation_by_column "$HOME"
-window_presentation_by_column "$HOME/Desktop"
-window_presentation_by_column "$HOME/Documents"
-window_presentation_by_column "$HOME/Downloads"
-window_presentation_by_column "$HOME/Library"
-window_presentation_by_column "$HOME/Movies"
-window_presentation_by_column "$HOME/Music"
-window_presentation_by_column "$HOME/Pictures"
-window_presentation_by_column "$HOME/Public"
-window_presentation_by_column "$HOME/VirtualBox\ VMs"
-window_presentation_by_column "/tmp"
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+window_add_to_the_sidebar() {
+
+    local folder_path="$1"
+
+    window_open_folder "$folder_path"
+
+    execute "./window_add_to_the_sidebar.applescript" \
+        "Add to the sidebar: $folder_path"
+    
+    window_close_folder
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+window_presentation_display_the_status_bar() {
+
+    window_open_folder "$HOME/Desktop"
+
+    execute "./window_presentation_display_the_status_bar.applescript" \
+        "Display the status bar"
+    
+    window_close_folder
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+window_presentation_options_by_column "/Applications"
+window_presentation_options_by_column "$HOME"
+window_presentation_options_by_column "$HOME/Desktop"
+window_presentation_options_by_column "$HOME/Documents"
+window_presentation_options_by_column "$HOME/Downloads"
+window_presentation_options_by_column "$HOME/Library"
+window_presentation_options_by_column "$HOME/Movies"
+window_presentation_options_by_column "$HOME/Music"
+window_presentation_options_by_column "$HOME/Pictures"
+window_presentation_options_by_column "$HOME/Public"
+window_presentation_options_by_column "$HOME/VirtualBox\ VMs"
+window_presentation_options_by_column "/tmp"
+
+window_add_to_the_sidebar "$HOME/Library"
+window_add_to_the_sidebar "$HOME/Projects"
+window_add_to_the_sidebar "$HOME/Screenshots"
+
+window_presentation_display_the_status_bar

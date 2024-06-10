@@ -9,24 +9,23 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 ./files.sh
 ./fonts.sh
 
-./displays.sh # applescripte
-./dock.sh # applescripte
-./finder.sh # applescripte
-./keyboard.sh # applescripte
-./language_and_region.sh # applescripte
-./mouse.sh # applescripte
-./panels.sh
-./screenshots.sh # defaults
-./siri.sh # applescripte
-# ./spaces.sh # applescripte To do
-./sound.sh # applescripte
-# ./trackpad.sh # applescripte To do
-./ui_and_ux.sh # applescripte
-./wallpaper.sh # applescripte
-./window.sh # applescripte
+./displays.sh
+./dock.sh
+./finder.sh
+./keyboard.sh
+./language_and_region.sh
+./mouse.sh
+./screenshots.sh
+./siri.sh
+./spaces.sh # TO DO
+./sound.sh
+./trackpad.sh # TO DO
+./ui_and_ux.sh
+./wallpaper.sh
+./window.sh
 
-# ./brave.sh # applescripte To do
-./safari.sh # applescripte
-./textedit.sh # applescripte
-./notes.sh # applescripte
-./terminal.sh # applescripte
+./brave.sh # TO DO
+./safari.sh
+./textedit.sh
+./notes.sh
+./terminal.sh
